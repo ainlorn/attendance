@@ -16,4 +16,7 @@ enum class StatusCode(val code: Int, val httpCode: Int, val message: String?) {
     PHONE_IN_USE(102, 400, "Номер телефона уже используется"),
     WRONG_CREDENTIALS(103, 400, "Неправильный логин или пароль"),
     USER_NOT_FOUND(104, 404, "Пользователь не найден"),
+
+    //Group
+    GROUP_NOT_FOUND(105, 404, "Группа не найдена"),
 }

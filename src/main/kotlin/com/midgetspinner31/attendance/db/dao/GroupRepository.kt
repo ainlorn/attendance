@@ -6,4 +6,4 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface GroupRepository : JpaRepository<Group, UUID>
+interface GroupRepository : JpaRepository<Group, UUID> {}

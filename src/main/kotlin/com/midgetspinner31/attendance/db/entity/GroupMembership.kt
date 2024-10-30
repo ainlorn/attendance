@@ -6,7 +6,7 @@ import java.util.*
 
 @Entity
 @Table(name = "group_memberships")
-class GroupMembership {
+class GroupMembership(group: Group, student: Student) {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
@@ -22,4 +22,6 @@ class GroupMembership {
 
     @Column(name = "start_date", insertable = false, updatable = false)
     val startDate: OffsetDateTime = OffsetDateTime.now()
+
+    var active: Boolean = true
 }

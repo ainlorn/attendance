@@ -1,7 +1,6 @@
 package com.midgetspinner31.attendance.db.entity
 
 import com.midgetspinner31.attendance.dto.TrainerDto
-import com.midgetspinner31.attendance.dto.UserDto
 import com.midgetspinner31.attendance.enumerable.UserRole
 import com.midgetspinner31.attendance.web.request.TrainerSignUpRequest
 import jakarta.persistence.DiscriminatorValue
@@ -12,7 +11,7 @@ import jakarta.persistence.Table
 @Table(name = "trainers")
 @DiscriminatorValue(UserRole.TRAINER_VALUE)
 class Trainer : User(role = UserRole.TRAINER) {
-    override fun toDto(): UserDto {
+    override fun toDto(): TrainerDto {
         return TrainerDto(id, fullName, login, email, phone)
     }
 

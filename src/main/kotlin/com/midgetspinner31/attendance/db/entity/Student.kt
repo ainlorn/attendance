@@ -1,7 +1,6 @@
 package com.midgetspinner31.attendance.db.entity
 
 import com.midgetspinner31.attendance.dto.StudentDto
-import com.midgetspinner31.attendance.dto.UserDto
 import com.midgetspinner31.attendance.enumerable.UserRole
 import com.midgetspinner31.attendance.web.request.StudentSignUpRequest
 import jakarta.persistence.Column
@@ -28,7 +27,7 @@ class Student : User(role = UserRole.STUDENT) {
     @Column(name = "parent_phone", nullable = false)
     var parentPhone: String? = null
 
-    override fun toDto(): UserDto {
+    override fun toDto(): StudentDto {
         return StudentDto(id, fullName, login, email, phone, beltLevel, birthDate, parentFullName, parentPhone)
     }
 
