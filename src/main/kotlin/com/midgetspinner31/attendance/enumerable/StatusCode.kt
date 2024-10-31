@@ -18,5 +18,6 @@ enum class StatusCode(val code: Int, val httpCode: Int, val message: String?) {
     USER_NOT_FOUND(104, 404, "Пользователь не найден"),
 
     //Group
-    GROUP_NOT_FOUND(105, 404, "Группа не найдена"),
+    GROUP_NOT_FOUND(200, 404, "Группа не найдена"),
+    MEMBER_ALREADY_IN_GROUP(201, 400, "Пользователь уже добавлен в группу")
 }

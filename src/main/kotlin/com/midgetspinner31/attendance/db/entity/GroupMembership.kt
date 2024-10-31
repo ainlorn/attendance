@@ -1,27 +1,30 @@
 package com.midgetspinner31.attendance.db.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
 import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
 @Table(name = "group_memberships")
-class GroupMembership(group: Group, student: Student) {
+class GroupMembership {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    val id: UUID? = null
+    var id: UUID? = null
 
     @ManyToOne
     @JoinColumn(name = "student_id", referencedColumnName = "id")
-    val student: Student? = null
+    var student: Student? = null
 
     @ManyToOne
     @JoinColumn(name = "group_id", referencedColumnName = "id")
-    val group: Group? = null
+    var group: Group? = null
 
-    @Column(name = "start_date", insertable = false, updatable = false)
-    val startDate: OffsetDateTime = OffsetDateTime.now()
+    @Column(name = "start_date", updatable = false)
+    @CreationTimestamp
+    var startDate: OffsetDateTime? = null
 
-    var active: Boolean = true
+    @Column(name = "active", nullable = false)
+    var active: Boolean? = null
 }

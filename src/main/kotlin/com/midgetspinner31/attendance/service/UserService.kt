@@ -9,4 +9,13 @@ interface UserService {
 
     @PreAuthorize("isAuthenticated()")
     fun getCurrentUserInfo(): UserDto
+
+    @PreAuthorize("isAuthenticated()")
+    fun isStudent(): Boolean
+
+    @PreAuthorize("isAuthenticated()")
+    fun isTrainer(): Boolean
+
+    @PreAuthorize("isAuthenticated()")
+    fun isAdmin(): Boolean
 }

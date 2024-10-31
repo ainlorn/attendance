@@ -6,29 +6,25 @@ import java.util.*
 
 @Entity
 @Table(name = "groups")
-class Group(name: String) {
+class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    val id: UUID? = null
+    var id: UUID? = null
 
     @Column(name = "name", nullable = false)
-    val name: String? = null
+    var name: String? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_id")
-    val trainer: Trainer? = null
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    val groupMemberships: List<GroupMembership> = mutableListOf()
+    var trainer: Trainer? = null
 
     companion object {
         fun Group.toDto(): GroupDto {
             return GroupDto(
                 id = this.id,
                 name = this.name,
-                trainer = this.trainer?.toDto(),
-                students = this.groupMemberships.map { it.student!!.toDto() }.toMutableList()
+                trainer = this.trainer?.toDto()
             )
         }
     }

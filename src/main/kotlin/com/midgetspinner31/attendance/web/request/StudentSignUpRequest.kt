@@ -17,7 +17,7 @@ class StudentSignUpRequest(
     parentFullName: String? = null,
     parentPhone: String? = null
 ) : SignUpRequest(login, fullName, email, phone, password) {
-    @Pattern(regexp = "^\\w{1,32}$")
+    @Pattern(regexp = "^[\\w ]{1,32}$")
     var beltLevel = trim(beltLevel)
         set(value) { field = trim(value) }
 
