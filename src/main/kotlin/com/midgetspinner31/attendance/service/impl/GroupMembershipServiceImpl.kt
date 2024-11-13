@@ -4,11 +4,11 @@ import com.midgetspinner31.attendance.db.dao.GroupMembershipRepository
 import com.midgetspinner31.attendance.db.dao.GroupRepository
 import com.midgetspinner31.attendance.db.dao.StudentRepository
 import com.midgetspinner31.attendance.db.dao.UserRepository
+import com.midgetspinner31.attendance.db.entity.Admin
 import com.midgetspinner31.attendance.db.entity.GroupMembership
 import com.midgetspinner31.attendance.db.entity.Student
 import com.midgetspinner31.attendance.db.entity.Trainer
 import com.midgetspinner31.attendance.dto.StudentPublicDto
-import com.midgetspinner31.attendance.exception.AccessDeniedException
 import com.midgetspinner31.attendance.exception.GroupNotFoundException
 import com.midgetspinner31.attendance.exception.MemberAlreadyInGroupException
 import com.midgetspinner31.attendance.exception.UserNotFoundException
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
-@Service
+@Service("groupMembershipService")
 class GroupMembershipServiceImpl(
     private val groupMembershipRepository: GroupMembershipRepository,
     private val studentRepository: StudentRepository,
@@ -27,12 +27,7 @@ class GroupMembershipServiceImpl(
 ) : GroupMembershipService {
     @Transactional
     override fun addMemberToGroup(groupId: UUID, memberId: UUID) {
-        val user = userRepository.getCurrentUser()!!
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupNotFoundException()
-
-        if (user is Trainer && user.id != group.trainer?.id) {
-            throw AccessDeniedException()
-        }
 
         val student = studentRepository.findByIdOrNull(memberId) ?: throw UserNotFoundException()
 
@@ -52,13 +47,6 @@ class GroupMembershipServiceImpl(
 
     @Transactional
     override fun removeMemberFromGroup(groupId: UUID, memberId: UUID) {
-        val user = userRepository.getCurrentUser()!!
-        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupNotFoundException()
-
-        if (user is Trainer && user.id != group.trainer?.id) {
-            throw AccessDeniedException()
-        }
-
         val membership = groupMembershipRepository.findActiveByGroupIdAndStudentId(groupId, memberId)
             ?: throw UserNotFoundException()
 
@@ -66,16 +54,6 @@ class GroupMembershipServiceImpl(
     }
 
     override fun getGroupStudents(groupId: UUID): List<StudentPublicDto> {
-        val user = userRepository.getCurrentUser()!!
-        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupNotFoundException()
-
-        if (user is Trainer && user.id != group.trainer?.id) {
-            throw AccessDeniedException()
-        }
-        if (user is Student && !isStudentInGroup(groupId, user.id!!)) {
-            throw AccessDeniedException()
-        }
-
         return groupMembershipRepository.findActiveByGroupId(groupId).map { it.student!!.toPublicDto() }
     }
 
@@ -83,5 +61,31 @@ class GroupMembershipServiceImpl(
         val membership = groupMembershipRepository.findByGroupIdAndStudentId(groupId, studentId)
             ?: return false
         return membership.active!!
+    }
+
+    override fun currentUserHasReadAccess(groupId: UUID): Boolean {
+        val user = userRepository.getCurrentUser()!!
+        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupNotFoundException()
+
+        if (user is Trainer && user.id != group.trainer?.id) {
+            return false
+        }
+        if (user is Student && !isStudentInGroup(groupId, user.id!!)) {
+            return false
+        }
+        return true
+    }
+
+    override fun currentUserHasWriteAccess(groupId: UUID): Boolean {
+        val user = userRepository.getCurrentUser()!!
+        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupNotFoundException()
+
+        if (user is Trainer && user.id == group.trainer?.id) {
+            return true
+        }
+        if (user is Admin) {
+            return true
+        }
+        return false
     }
 }
