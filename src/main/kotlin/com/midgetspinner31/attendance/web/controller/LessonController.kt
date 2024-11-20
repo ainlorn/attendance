@@ -1,6 +1,7 @@
 package com.midgetspinner31.attendance.web.controller
 
 import com.midgetspinner31.attendance.dto.LessonDto
+import com.midgetspinner31.attendance.dto.LessonWithGroupDto
 import com.midgetspinner31.attendance.service.LessonService
 import com.midgetspinner31.attendance.web.annotation.ApiV1
 import com.midgetspinner31.attendance.web.request.ScheduleBatchRequest
@@ -27,6 +28,20 @@ class LessonController(
                 lessonService.getLessonsInPeriod(groupId, startTime, endTime)
             } else {
                 lessonService.getCurrentWeekLessons(groupId)
+            }
+        )
+    }
+
+    @GetMapping("/me/schedule")
+    fun getMySchedule(
+        @RequestParam(required = false) startTime: OffsetDateTime?,
+        @RequestParam(required = false) endTime: OffsetDateTime?
+    ): ListResponse<LessonWithGroupDto> {
+        return ListResponse(
+            if (startTime != null && endTime != null) {
+                lessonService.getMyLessonsInPeriod(startTime, endTime)
+            } else {
+                lessonService.getMyCurrentWeekLessons()
             }
         )
     }

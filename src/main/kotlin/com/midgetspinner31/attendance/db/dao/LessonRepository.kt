@@ -12,4 +12,8 @@ interface LessonRepository : JpaRepository<Lesson, UUID> {
             "(l.startTime between :startTime and :endTime or l.endTime between :startTime and :endTime)")
     fun findByGroupInTimeInterval(groupId: UUID, startTime: OffsetDateTime, endTime: OffsetDateTime): List<Lesson>
 
+    @Query("select l from Lesson l where l.group.id in :groupId and " +
+            "(l.startTime between :startTime and :endTime or l.endTime between :startTime and :endTime)")
+    fun findByGroupsInTimeInterval(groupId: Collection<UUID>, startTime: OffsetDateTime, endTime: OffsetDateTime): List<Lesson>
+
 }

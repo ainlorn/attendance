@@ -1,6 +1,7 @@
 package com.midgetspinner31.attendance.db.entity
 
 import com.midgetspinner31.attendance.dto.LessonDto
+import com.midgetspinner31.attendance.dto.LessonWithGroupDto
 import jakarta.persistence.*
 import java.time.OffsetDateTime
 import java.util.*
@@ -29,5 +30,9 @@ class Lesson {
 
     fun toDto(): LessonDto {
         return LessonDto(id, startTime, endTime)
+    }
+
+    fun toDtoWithGroup(): LessonWithGroupDto {
+        return LessonWithGroupDto(id, group?.id, startTime, endTime)
     }
 }
