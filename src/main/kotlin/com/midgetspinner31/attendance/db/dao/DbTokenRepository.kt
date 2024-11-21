@@ -5,12 +5,14 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Component
 class DbTokenRepository(
     private val persistentLoginRepository: PersistentLoginRepository
 ) : PersistentTokenRepository {
+    @Transactional
     override fun createNewToken(token: PersistentRememberMeToken) {
         if (persistentLoginRepository.existsBySeries(token.series))
             throw DataIntegrityViolationException("Series Id '${token.series}' already exists!")
@@ -25,6 +27,7 @@ class DbTokenRepository(
         persistentLoginRepository.save(dbToken)
     }
 
+    @Transactional
     override fun updateToken(series: String, tokenValue: String, lastUsed: Date) {
         val token = persistentLoginRepository.findBySeries(series) ?: return
         token.token = tokenValue
@@ -38,6 +41,7 @@ class DbTokenRepository(
         }
     }
 
+    @Transactional
     override fun removeUserTokens(username: String) {
         persistentLoginRepository.deleteAllByUsername(username)
     }

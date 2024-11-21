@@ -23,5 +23,8 @@ enum class StatusCode(val code: Int, val httpCode: Int, val message: String?) {
     MEMBER_ALREADY_IN_GROUP(201, 400, "Пользователь уже добавлен в группу"),
 
     // price period
-    PRICE_PERIOD_NOT_FOUND(300, 404, "Период не найден")
+    PRICE_PERIOD_NOT_FOUND(300, 404, "Период не найден"),
+
+    // lesson
+    LESSON_NOT_FOUND(400, 404, "Занятие не найдено")
 }
