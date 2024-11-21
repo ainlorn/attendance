@@ -16,6 +16,7 @@ import com.midgetspinner31.attendance.service.GroupMembershipService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.OffsetDateTime
 import java.util.*
 
 @Service("groupMembershipService")
@@ -50,6 +51,7 @@ class GroupMembershipServiceImpl(
         val membership = groupMembershipRepository.findActiveByGroupIdAndStudentId(groupId, memberId)
             ?: throw UserNotFoundException()
 
+        membership.endDate = OffsetDateTime.now()
         membership.active = false
     }
 
