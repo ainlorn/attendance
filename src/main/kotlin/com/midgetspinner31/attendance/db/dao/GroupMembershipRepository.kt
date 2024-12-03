@@ -7,6 +7,10 @@ import java.time.OffsetDateTime
 import java.util.*
 
 interface GroupMembershipRepository : JpaRepository<GroupMembership, UUID> {
+
+    @Query("select gm from GroupMembership gm where gm.group.id = :groupId")
+    fun findAllWithInactiveByGroupId(groupId: UUID): List<GroupMembership>
+
     @Query("select gm from GroupMembership gm where gm.active = true and gm.group.id = :groupId")
     fun findActiveByGroupId(groupId: UUID): List<GroupMembership>
 

@@ -1,10 +1,10 @@
 package com.midgetspinner31.attendance.service.impl
 
-import com.midgetspinner31.attendance.db.dao.GroupMembershipRepository
-import com.midgetspinner31.attendance.db.dao.LessonAttendanceRepository
-import com.midgetspinner31.attendance.db.dao.LessonRepository
+import com.midgetspinner31.attendance.db.dao.*
 import com.midgetspinner31.attendance.db.entity.LessonAttendance
+import com.midgetspinner31.attendance.db.entity.Transaction
 import com.midgetspinner31.attendance.dto.StudentAttendanceDto
+import com.midgetspinner31.attendance.enumerable.TransactionType
 import com.midgetspinner31.attendance.exception.LessonNotFoundException
 import com.midgetspinner31.attendance.exception.UserNotFoundException
 import com.midgetspinner31.attendance.service.LessonAttendanceService
@@ -16,7 +16,9 @@ import java.util.*
 class LessonAttendanceServiceImpl(
     private val lessonAttendanceRepository: LessonAttendanceRepository,
     private val lessonRepository: LessonRepository,
-    private val groupMembershipRepository: GroupMembershipRepository
+    private val groupMembershipRepository: GroupMembershipRepository,
+    private val transactionRepository: TransactionRepository,
+    private val lessonPricePeriodRepository: LessonPricePeriodRepository
 ) : LessonAttendanceService {
     override fun getAttendanceForLesson(groupId: UUID, lessonId: UUID): List<StudentAttendanceDto> {
         val lesson = lessonRepository.findByGroupIdAndId(groupId, lessonId)
@@ -56,14 +58,26 @@ class LessonAttendanceServiceImpl(
     override fun markAttendance(groupId: UUID, lessonId: UUID, studentId: UUID): StudentAttendanceDto {
         val lesson = lessonRepository.findByGroupIdAndId(groupId, lessonId)
             ?: throw LessonNotFoundException()
-        val membership = groupMembershipRepository.findByGroupIdAndStudentIdAndDate(groupId, studentId, lesson.startTime!!)
-            ?: throw UserNotFoundException()
+        val membership =
+            groupMembershipRepository.findByGroupIdAndStudentIdAndDate(groupId, studentId, lesson.startTime!!)
+                ?: throw UserNotFoundException()
 
         val attendance = lessonAttendanceRepository.findByLessonIdAndStudentId(lessonId, studentId)
             ?: lessonAttendanceRepository.save(LessonAttendance().apply {
                 this.student = membership.student
                 this.lesson = lesson
             })
+
+        lessonPricePeriodRepository.findByGroupAndTime(lesson.group!!.id!!, lesson.startTime!!)?.let { price ->
+            transactionRepository.findByTransactionTypeAndKey(TransactionType.LESSON_PAYMENT, attendance.id!!)
+                ?: transactionRepository.save(Transaction().apply {
+                    this.student = membership.student
+                    this.transactionType = TransactionType.LESSON_PAYMENT
+                    this.key = attendance.id
+                    this.dt = lesson.startTime
+                    this.sum = -price.price!!
+                })
+        }
 
         return StudentAttendanceDto(
             attendance.student!!.fullName,
@@ -76,12 +90,14 @@ class LessonAttendanceServiceImpl(
     override fun unmarkAttendance(groupId: UUID, lessonId: UUID, studentId: UUID) {
         val lesson = lessonRepository.findByGroupIdAndId(groupId, lessonId)
             ?: throw LessonNotFoundException()
-        val membership = groupMembershipRepository.findByGroupIdAndStudentIdAndDate(groupId, studentId, lesson.startTime!!)
-            ?: throw UserNotFoundException()
+        val membership =
+            groupMembershipRepository.findByGroupIdAndStudentIdAndDate(groupId, studentId, lesson.startTime!!)
+                ?: throw UserNotFoundException()
 
-        val attendance = lessonAttendanceRepository.findByLessonIdAndStudentId(lessonId, studentId)
-        if (attendance != null) {
+        lessonAttendanceRepository.findByLessonIdAndStudentId(lessonId, studentId)?.let { attendance ->
             lessonAttendanceRepository.delete(attendance)
+            transactionRepository.findByTransactionTypeAndKey(TransactionType.LESSON_PAYMENT, attendance.id!!)
+                ?.let { tx -> transactionRepository.delete(tx) }
         }
     }
 }
