@@ -1,15 +1,14 @@
 package com.midgetspinner31.attendance.web.controller
 
+import com.midgetspinner31.attendance.dto.LessonWithAttendanceDto
 import com.midgetspinner31.attendance.dto.StudentAttendanceDto
 import com.midgetspinner31.attendance.service.LessonAttendanceService
 import com.midgetspinner31.attendance.web.annotation.ApiV1
 import com.midgetspinner31.attendance.web.response.EmptyResponse
 import com.midgetspinner31.attendance.web.response.ItemResponse
 import com.midgetspinner31.attendance.web.response.ListResponse
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.*
+import java.time.OffsetDateTime
 import java.util.*
 
 @ApiV1
@@ -41,5 +40,20 @@ class LessonAttendanceController(
     ): EmptyResponse {
         lessonAttendanceService.unmarkAttendance(groupId, lessonId, studentId)
         return EmptyResponse()
+    }
+
+    @GetMapping("/groups/{groupId}/attendance")
+    fun getAttendanceForPeriod(
+        @PathVariable groupId: UUID,
+        @RequestParam(required = false) startTime: OffsetDateTime?,
+        @RequestParam(required = false) endTime: OffsetDateTime?
+    ): ListResponse<LessonWithAttendanceDto> {
+        return ListResponse(
+            if (startTime != null && endTime != null) {
+                lessonAttendanceService.getAttendanceInPeriod(groupId, startTime, endTime)
+            } else {
+                lessonAttendanceService.getCurrentWeekAttendance(groupId)
+            }
+        )
     }
 }

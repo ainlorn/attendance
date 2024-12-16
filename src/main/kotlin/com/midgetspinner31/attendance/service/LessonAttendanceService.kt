@@ -1,7 +1,9 @@
 package com.midgetspinner31.attendance.service
 
+import com.midgetspinner31.attendance.dto.LessonWithAttendanceDto
 import com.midgetspinner31.attendance.dto.StudentAttendanceDto
 import org.springframework.security.access.prepost.PreAuthorize
+import java.time.OffsetDateTime
 import java.util.*
 
 interface LessonAttendanceService {
@@ -13,4 +15,10 @@ interface LessonAttendanceService {
 
     @PreAuthorize("@groupMembershipService.currentUserHasWriteAccess(#groupId)")
     fun unmarkAttendance(groupId: UUID, lessonId: UUID, studentId: UUID)
+
+    @PreAuthorize("@groupMembershipService.currentUserHasReadAccess(#groupId)")
+    fun getAttendanceInPeriod(groupId: UUID, startTime: OffsetDateTime, endTime: OffsetDateTime): List<LessonWithAttendanceDto>
+
+    @PreAuthorize("@groupMembershipService.currentUserHasReadAccess(#groupId)")
+    fun getCurrentWeekAttendance(groupId: UUID): List<LessonWithAttendanceDto>
 }
