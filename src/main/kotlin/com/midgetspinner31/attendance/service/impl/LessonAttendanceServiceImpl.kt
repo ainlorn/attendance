@@ -3,19 +3,23 @@ package com.midgetspinner31.attendance.service.impl
 import com.midgetspinner31.attendance.db.dao.*
 import com.midgetspinner31.attendance.db.entity.LessonAttendance
 import com.midgetspinner31.attendance.db.entity.Transaction
+import com.midgetspinner31.attendance.dto.LessonWithAttendanceDto
 import com.midgetspinner31.attendance.dto.StudentAttendanceDto
 import com.midgetspinner31.attendance.enumerable.TransactionType
 import com.midgetspinner31.attendance.exception.LessonNotFoundException
 import com.midgetspinner31.attendance.exception.UserNotFoundException
 import com.midgetspinner31.attendance.service.LessonAttendanceService
+import com.midgetspinner31.attendance.service.LessonService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.OffsetDateTime
 import java.util.*
 
 @Service
 class LessonAttendanceServiceImpl(
     private val lessonAttendanceRepository: LessonAttendanceRepository,
     private val lessonRepository: LessonRepository,
+    private val lessonService: LessonService,
     private val groupMembershipRepository: GroupMembershipRepository,
     private val transactionRepository: TransactionRepository,
     private val lessonPricePeriodRepository: LessonPricePeriodRepository
@@ -99,5 +103,17 @@ class LessonAttendanceServiceImpl(
             transactionRepository.findByTransactionTypeAndKey(TransactionType.LESSON_PAYMENT, attendance.id!!)
                 ?.let { tx -> transactionRepository.delete(tx) }
         }
+    }
+
+    override fun getAttendanceInPeriod(groupId: UUID, startTime: OffsetDateTime, endTime: OffsetDateTime): List<LessonWithAttendanceDto> {
+        return lessonService
+            .getLessonsInPeriod(groupId, startTime, endTime)
+            .map { LessonWithAttendanceDto(it, getAttendanceForLesson(groupId, it.id!!)) }
+    }
+
+    override fun getCurrentWeekAttendance(groupId: UUID): List<LessonWithAttendanceDto> {
+        return lessonService
+            .getCurrentWeekLessons(groupId)
+            .map { LessonWithAttendanceDto(it, getAttendanceForLesson(groupId, it.id!!)) }
     }
 }
