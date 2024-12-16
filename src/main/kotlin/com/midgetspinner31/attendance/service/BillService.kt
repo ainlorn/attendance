@@ -16,6 +16,9 @@ interface BillService {
     @PreAuthorize("@userService.isTrainer() || @userService.isAdmin()")
     fun getPendingBills(): List<BillDto>
 
+    @PreAuthorize("@userService.isStudent()")
+    fun getMyBills(): List<BillDto>
+
     @PreAuthorize("@userService.isTrainer() || @userService.isAdmin()")
     fun approveBill(id: UUID): BillDto
 

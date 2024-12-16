@@ -105,4 +105,9 @@ class BillServiceImpl(
 
         billRepository.delete(bill)
     }
+
+    override fun getMyBills(): List<BillDto> {
+        val user = userRepository.getCurrentUser()!!
+        return billRepository.findAllByStudentId(user.id!!).map { billMapper.toDto(it) }
+    }
 }

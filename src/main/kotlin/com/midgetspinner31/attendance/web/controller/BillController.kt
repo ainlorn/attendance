@@ -33,6 +33,11 @@ class BillController(
         return ListResponse(billService.getPendingBills())
     }
 
+    @GetMapping("/me/bills")
+    fun getMyBills(): ListResponse<BillDto> {
+        return ListResponse(billService.getMyBills())
+    }
+
     @GetMapping("/bills/by-id/{id}")
     fun getBill(@PathVariable id: UUID): ItemResponse<BillDto> {
         return ItemResponse(billService.getBill(id))
