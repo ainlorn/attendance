@@ -26,5 +26,9 @@ enum class StatusCode(val code: Int, val httpCode: Int, val message: String?) {
     PRICE_PERIOD_NOT_FOUND(300, 404, "Период не найден"),
 
     // lesson
-    LESSON_NOT_FOUND(400, 404, "Занятие не найдено")
+    LESSON_NOT_FOUND(400, 404, "Занятие не найдено"),
+
+    // bill
+    BILL_NOT_FOUND(500, 404, "Чек не найден"),
+    BILL_STATUS_LOCKED(501, 404, "Невозиожно изменить статус чека")
 }

@@ -32,3 +32,5 @@ class MemberAlreadyInGroupException : ApiException(StatusCode.MEMBER_ALREADY_IN_
 class IncorrectTimeRangeException : ApiException(StatusCode.INCORRECT_TIME_RANGE)
 class PricePeriodNotFoundException : ApiException(StatusCode.PRICE_PERIOD_NOT_FOUND)
 class LessonNotFoundException : ApiException(StatusCode.LESSON_NOT_FOUND)
+class BillNotFoundException : ApiException(StatusCode.BILL_NOT_FOUND)
+class BillStatusLockedException : ApiException(StatusCode.BILL_STATUS_LOCKED)
