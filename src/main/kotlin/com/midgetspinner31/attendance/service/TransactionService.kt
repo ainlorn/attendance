@@ -11,7 +11,13 @@ interface TransactionService {
     fun getMyBalance(): Long
 
     @PreAuthorize("isAuthenticated()")
-    fun getTransactionsByStudent(studentId: UUID, startTime: OffsetDateTime?, endTime: OffsetDateTime?): List<TransactionDto>
+    fun getBalanceByStudent(studentId: UUID): Long
+
+    @PreAuthorize("isAuthenticated()")
+    fun getBalanceByStudentOnTimestamp(studentId: UUID, timestamp: OffsetDateTime): Long
+
+    @PreAuthorize("isAuthenticated()")
+    fun getTransactionsByStudent(studentId: UUID, startTime: OffsetDateTime?, endTime: OffsetDateTime?): StudentWithTransactionsDto
 
     @PreAuthorize("@groupMembershipService.currentUserHasWriteAccess(#groupId)")
     fun getTransactionsByGroup(groupId: UUID, startTime: OffsetDateTime?, endTime: OffsetDateTime?): List<StudentWithTransactionsDto>

@@ -19,4 +19,7 @@ interface TransactionRepository : JpaRepository<Transaction, UUID> {
     @Query("select coalesce(sum(t.sum), 0) from Transaction t where t.student.id=:studentId")
     fun getBalanceByStudentId(studentId: UUID): Long
 
+    @Query("select coalesce(sum(t.sum), 0) from Transaction t where t.student.id=:studentId and t.dt <= :datetime")
+    fun getBalanceByStudentIdOnTimestamp(studentId: UUID, datetime: OffsetDateTime): Long
+
 }

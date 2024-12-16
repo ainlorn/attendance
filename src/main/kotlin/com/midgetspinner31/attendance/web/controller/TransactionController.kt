@@ -21,6 +21,11 @@ class TransactionController(
         return ItemResponse(transactionService.getMyBalance())
     }
 
+    @GetMapping("/students/{studentId}/balance")
+    fun getStudentBalance(@PathVariable studentId: UUID): ItemResponse<Long> {
+        return ItemResponse(transactionService.getBalanceByStudent(studentId))
+    }
+
     @GetMapping("/groups/{groupId}/transactions")
     fun getGroupTransactions(
         @PathVariable groupId: UUID,
@@ -35,8 +40,8 @@ class TransactionController(
         @PathVariable studentId: UUID,
         @RequestParam(required = false) startTime: OffsetDateTime?,
         @RequestParam(required = false) endTime: OffsetDateTime?
-    ): ListResponse<TransactionDto> {
-        return ListResponse(transactionService.getTransactionsByStudent(studentId, startTime, endTime))
+    ): ItemResponse<StudentWithTransactionsDto> {
+        return ItemResponse(transactionService.getTransactionsByStudent(studentId, startTime, endTime))
     }
 
     /**
